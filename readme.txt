@@ -27,6 +27,9 @@ This plugin relies on the ChatBlow API (`https://chatblow.com`) to verify your r
 
 For more information, please refer to our [Privacy Policy](https://chatblow.com/privacy-policy) and [Terms of Service](https://chatblow.com/terms-and-conditions).
 
+### Open Source
+Find the source code, report issues, and contribute on [GitHub](https://github.com/ChatBlow/chatblow-wordpress-plugin).
+
 == Installation ==
 
 1. Upload the `chatblow` directory to the `/wp-content/plugins/` directory.
