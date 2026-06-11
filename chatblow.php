@@ -117,7 +117,7 @@ class ChatBlowPlugin {
             jQuery(document).ready(function($) {
                 $.post(ajaxurl, {
                     action: 'chatblow_verify_site',
-                    nonce: '<?php echo wp_create_nonce('chatblow_verify'); ?>'
+                    nonce: '<?php echo esc_js(wp_create_nonce('chatblow_verify')); ?>'
                 }, function(response) {
                     const panel = $('#chatblow-status-panel');
                     
