@@ -1,4 +1,4 @@
-=== ChatBlow - Multi Channel AI Customer Support Platform ===
+=== ChatBlow - Multi channel customer support platform ===
 Contributors: chatblow
 Tags: ai, chatbot, assistant, ai assistant, chat, ticket, live-chat, agent, facebook, messenger
 Requires at least: 5.0
@@ -11,7 +11,7 @@ The official ChatBlow WordPress plugin to embed the customer support platform on
 
 == Description ==
 
-ChatBlow is a powerful AI assistant that helps you engage with your visitors. The official ChatBlow WordPress plugin makes it incredibly easy to add the ChatBlow widget to your site with just a few clicks. It supports Facebook page comment and message auto reply, AI chatbot, unlimited live chat and support ticket with human support agent.
+ChatBlow is a powerful AI trained multi channel customer support platform that helps you engage with your community. It supports Facebook page comment and message auto reply, AI chatbot, unlimited live chat and support ticket with human agent.
 
 ### Features
 * **Easy Integration:** No coding required. Simply install, configure, and your AI assistant is live.
