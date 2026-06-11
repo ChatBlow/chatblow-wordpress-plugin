@@ -18,14 +18,15 @@ class ChatBlowPlugin {
     public function __construct() {
         add_action('admin_menu', array($this, 'register_admin_menu'));
         add_action('wp_ajax_chatblow_verify_site', array($this, 'ajax_verify_site'));
-        add_action('wp_footer', array($this, 'inject_assistant_script'));
+        add_action('wp_enqueue_scripts', array($this, 'enqueue_assistant_script'));
+        add_filter('script_loader_tag', array($this, 'add_script_attributes'), 10, 2);
         add_action('admin_init', array($this, 'register_settings'));
     }
 
     public function register_settings() {
-        register_setting('chatblow_settings', 'chatblow_enabled');
-        register_setting('chatblow_settings', 'chatblow_widget_position');
-        register_setting('chatblow_settings', 'chatblow_pass_user_meta');
+        register_setting('chatblow_settings', 'chatblow_enabled', array('sanitize_callback' => 'absint'));
+        register_setting('chatblow_settings', 'chatblow_widget_position', array('sanitize_callback' => 'sanitize_text_field'));
+        register_setting('chatblow_settings', 'chatblow_pass_user_meta', array('sanitize_callback' => 'absint'));
     }
 
     public function register_admin_menu() {
@@ -150,6 +151,10 @@ class ChatBlowPlugin {
     public function ajax_verify_site() {
         check_ajax_referer('chatblow_verify', 'nonce');
 
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Unauthorized');
+        }
+
         $api_url = 'https://chatblow.com/api/plugin/verify';
 
         $response = wp_remote_post($api_url, array(
@@ -167,6 +172,20 @@ class ChatBlowPlugin {
         $data = json_decode($body, true);
 
         if (json_last_error() === JSON_ERROR_NONE) {
+            // Sanitize API data to prevent XSS
+            if (isset($data['data']['plan'])) {
+                $data['data']['plan'] = sanitize_text_field($data['data']['plan']);
+            }
+            if (isset($data['data']['tokens'])) {
+                $data['data']['tokens'] = absint($data['data']['tokens']);
+            }
+            if (isset($data['plan'])) {
+                $data['plan'] = sanitize_text_field($data['plan']);
+            }
+            if (isset($data['tokens'])) {
+                $data['tokens'] = absint($data['tokens']);
+            }
+
             // The API response already wraps the data in 'success' and 'data'
             if (isset($data['success']) && $data['success'] && isset($data['data'])) {
                 wp_send_json_success($data['data']);
@@ -178,13 +197,21 @@ class ChatBlowPlugin {
         }
     }
 
-    public function inject_assistant_script() {
+    public function enqueue_assistant_script() {
         $enabled = get_option('chatblow_enabled', '1');
         if (!$enabled) {
             return;
         }
 
         $script_url = 'https://chatblow.com/static/assistant.js';
+        wp_enqueue_script('chatblow-assistant', $script_url, array(), '1.0.1', true);
+    }
+
+    public function add_script_attributes($tag, $handle) {
+        if ('chatblow-assistant' !== $handle) {
+            return $tag;
+        }
+
         $position = get_option('chatblow_widget_position', 'bottom-right');
         $pass_meta = get_option('chatblow_pass_user_meta', '0');
 
@@ -201,11 +228,15 @@ class ChatBlowPlugin {
 
         $meta_attr = '';
         if (!empty($metadata)) {
-            $meta_attr = " data-metadata='" . esc_attr(json_encode($metadata)) . "'";
+            $meta_attr = ' data-metadata="' . esc_attr(json_encode($metadata)) . '"';
         }
-        
-        echo "<!-- ChatBlow Widget -->\n";
-        echo "<script src='" . esc_url($script_url) . "' data-position='" . esc_attr($position) . "'" . $meta_attr . "></script>\n";
+
+        $position_attr = ' data-position="' . esc_attr($position) . '"';
+
+        // Inject the attributes into the script tag
+        $tag = str_replace(' src', $position_attr . $meta_attr . ' src', $tag);
+
+        return $tag;
     }
 }
 
