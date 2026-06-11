@@ -5,7 +5,7 @@
  * Description: The official ChatBlow WordPress plugin to embed the AI assistant on your site.
  * Version: 1.0.1
  * Author: ChatBlow
- * Author URI: https://chatblow.com/
+ * Author URI: https://chatblow.com/about-us
  * License: GPLv2 or later
  */
 
